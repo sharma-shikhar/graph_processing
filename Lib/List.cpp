@@ -10,10 +10,11 @@ class Node {
 template <typename T>
 class List {
     Node<T> *current_node;
-  public:
-	Node<T> *head;
+  	Node<T> *head;
 	Node<T> *tail;
-	List() : head(nullptr), tail(nullptr), current_node(nullptr) {}
+	int _size;
+  public:
+	List() : head(nullptr), tail(nullptr), current_node(nullptr), _size(0) {}
 	~List() {
 		Node<T> *n = this->head;
 		Node<T> *cur = nullptr;
@@ -22,8 +23,10 @@ class List {
 			n = n->next;
 			delete cur;
 		}
+		_size = 0;
 	}
 	bool empty() {return head == nullptr;}
+	int size() {return _size;}
 
 	T push_back(T data);
 	T pop_front();
@@ -67,6 +70,7 @@ T List<T>::pop_front() {
 		T data = this->head->data;
 		delete this->head;
 		this->head = this->tail = nullptr;
+		_size--;
 		return data;
 	}
 	else {
@@ -74,6 +78,7 @@ T List<T>::pop_front() {
 		T data = n->data;
 		this->head = this->head->next;
 		delete n;
+		_size--;
 		return data; 
 	}
 }
@@ -89,6 +94,6 @@ T List<T>::push_back(T data) {
 		this->tail->next = n;
 		this->tail = n;
 	}
-	
+	_size++;
 	return n->data;
 }
