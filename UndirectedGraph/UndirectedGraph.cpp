@@ -7,16 +7,11 @@
 #include "UndirectedEdge.cpp"
 #include "../Lib/string_funcs.cpp"
 
-
-// use this inside lambda inside connected_components() because lambdas with capture cannot be converted to function pointers
-// this is a hackish solution; improve it when you get time
-int _component_number_tmp = 0;
-
 template <typename T>
 class UndirectedGraph {
 	public:
 	
-	static void input_line_handler_1(UndirectedGraph<T> *g, std::string &line, T (*parser)(const std::string &));
+	static void input_line_handler_1(UndirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
 		
 	List<Vertex<T> *> *vertices;
 	List<UndirectedEdge<T> *> *edges;
@@ -50,9 +45,9 @@ class UndirectedGraph {
 		vertices = new List<Vertex<T> *>();
 		edges = new List<UndirectedEdge<T> *>();
 	}
-	void init_with_file(const std::string filename, void (*input_line_handler)(UndirectedGraph<T> *, std::string &, T (*parser)(const std::string &)), T (*parser)(const std::string &));
+	void init_with_file(const std::string filename, std::function<void(UndirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser);
 	void mark_all_vertices_unexplored();
-	void bfs_from(Vertex<T> *s, void (*handle_edge_and_vertex)(UndirectedEdge<T> *, Vertex<T> *));
+	void bfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex);
 	void shortest_path_by_edge_cardinality(Vertex<T> *s);
 	
 	void connected_components();
@@ -61,7 +56,7 @@ class UndirectedGraph {
 };
 
 template <typename T>
-void UndirectedGraph<T>::input_line_handler_1(UndirectedGraph<T> *g, std::string &line, T (*parser)(const std::string &)) {
+void UndirectedGraph<T>::input_line_handler_1(UndirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser) {
 	trim(line);
 	if (line.size() == 0) return;
 	
@@ -96,7 +91,7 @@ Vertex<T> * UndirectedGraph<T>::get_or_create_vertex(T val) {
 }
 
 template <typename T>
-void UndirectedGraph<T>::init_with_file(const std::string filename, void (*input_line_handler)(UndirectedGraph<T> *, std::string &, T (*parser)(const std::string &)), T (*parser)(const std::string &)) {
+void UndirectedGraph<T>::init_with_file(const std::string filename, std::function<void(UndirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser) {
 	std::string line;
 	std::ifstream myfile(filename);
 	
@@ -121,7 +116,7 @@ void UndirectedGraph<T>::mark_all_vertices_unexplored() {
 }
 
 template <typename T>
-void UndirectedGraph<T>::bfs_from(Vertex<T> *s, void (*handle_edge_and_vertex)(UndirectedEdge<T> *, Vertex<T> *)) {
+void UndirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex) {
 	Queue<Vertex<T> *> *q = new Queue<Vertex<T> *>();
 	
 	q->enqueue(s);
@@ -167,17 +162,16 @@ void UndirectedGraph<T>::connected_components() {
 	
 	Vertex<T> *v = vertices->traverse_init();
 	
-	_component_number_tmp = 0;
-	
+	int component_number = 0;
+	std::function<void(UndirectedEdge<T> *edge, Vertex<T> *vertex)> assign_component_number =
+		[&component_number] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
+					vertex->data->component_number = component_number;
+		};
+		
 	while (v) {
 		if (!v->explored) {
-			bfs_from(v, 
-				[] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
-					vertex->data->component_number = _component_number_tmp;
-				}
-			);
-			
-			_component_number_tmp++;
+			bfs_from(v, assign_component_number);
+			component_number++;
 		}
 		
 		v = vertices->traverse_next();

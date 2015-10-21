@@ -12,7 +12,7 @@ template <typename T>
 class DirectedGraph {
 	public:
 	
-	static void input_line_handler_1(DirectedGraph<T> *g, std::string &line, T (*parser)(const std::string &));
+	static void input_line_handler_1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
 	
 	List<Vertex<T> *> *vertices;
 	List<DirectedEdge<T> *> *edges;
@@ -47,10 +47,10 @@ class DirectedGraph {
 		edges = new List<DirectedEdge<T> *>();
 	}
 	
-	void init_with_file(const std::string filename, void (*input_line_handler)(DirectedGraph<T> *, std::string &, T (*parser)(const std::string &)), T (*parser)(const std::string &));
+	void init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser);
 	
 	void mark_all_vertices_unexplored();
-	void bfs_from(Vertex<T> *s, void (*handle_edge_and_vertex)(DirectedEdge<T> *, Vertex<T> *));
+	void bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex);
 	void shortest_path_by_edge_cardinality(Vertex<T> *s);
 	
 	void disp();
@@ -58,7 +58,7 @@ class DirectedGraph {
 
 
 template <typename T>
-void DirectedGraph<T>::input_line_handler_1(DirectedGraph<T> *g, std::string &line, T (*parser)(const std::string &)) {
+void DirectedGraph<T>::input_line_handler_1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser) {
 	trim(line);
 	if (line.size() == 0) return;
 	
@@ -91,7 +91,7 @@ Vertex<T> * DirectedGraph<T>::get_or_create_vertex(T val) {
 }
 
 template <typename T>
-void DirectedGraph<T>::init_with_file(const std::string filename, void (*input_line_handler)(DirectedGraph<T> *, std::string &, T (*parser)(const std::string &)), T (*parser)(const std::string &)) {
+void DirectedGraph<T>::init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser) {
 	std::string line;
 	std::ifstream myfile(filename);
 	
@@ -116,7 +116,7 @@ void DirectedGraph<T>::mark_all_vertices_unexplored() {
 }
 
 template <typename T>
-void DirectedGraph<T>::bfs_from(Vertex<T> *s, void (*handle_edge_and_vertex)(DirectedEdge<T> *, Vertex<T> *)) {
+void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex) {
 	Queue<Vertex<T> *> *q = new Queue<Vertex<T> *>();
 	
 	q->enqueue(s);
@@ -143,7 +143,7 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, void (*handle_edge_and_vertex)(Dir
 
 template <typename T>
 void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
-	mark_all_vertices_unexplored()
+	mark_all_vertices_unexplored();
 	
 	bfs_from(s, 
 	[] (DirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
