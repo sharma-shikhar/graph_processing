@@ -45,9 +45,10 @@ class UndirectedGraph {
 		vertices = new List<Vertex<T> *>();
 		edges = new List<UndirectedEdge<T> *>();
 	}
-	void init_with_file(const std::string filename, std::function<void(UndirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser);
+	void init_with_file(const std::string filename, std::function<void(UndirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler = UndirectedGraph<T>::input_line_handler_1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
 	void mark_all_vertices_unexplored();
-	void bfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex);
+	void bfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr);
+	void dfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
 	void shortest_path_by_edge_cardinality(Vertex<T> *s);
 	
 	void connected_components();
@@ -120,7 +121,7 @@ void UndirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(UndirectedEdg
 	Queue<Vertex<T> *> *q = new Queue<Vertex<T> *>();
 	
 	q->enqueue(s);
-	handle_edge_and_vertex(nullptr, s);
+	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
 	s->explored = true;
 	
 	while (!q->empty()) {
@@ -131,7 +132,7 @@ void UndirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(UndirectedEdg
 			Vertex<T> *adjacent_vertex = edge->get_other_vertex(v); 
 			if (adjacent_vertex->explored == false) {
 				q->enqueue(adjacent_vertex);
-				handle_edge_and_vertex(edge, adjacent_vertex);
+				if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
 				adjacent_vertex->explored = true;
 			}
 			edge = v->adjacencyList->traverse_next();
@@ -140,6 +141,24 @@ void UndirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(UndirectedEdg
 	}
 }
 
+template <typename T>
+void UndirectedGraph<T>::dfs_from(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex, std::function<void(Vertex<T> *)> run_end) {
+	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
+	s->explored = true;
+	
+	Vertex<T> *v = s;
+	UndirectedEdge<T> *edge = v->adjacencyList->traverse_init();
+	while (edge) {
+		Vertex<T> *adjacent_vertex = edge->get_other_vertex(v); 
+		if (adjacent_vertex->explored == false) {
+			if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
+			adjacent_vertex->explored = true;
+			dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
+		}
+		edge = v->adjacencyList->traverse_next();
+	}
+	if (run_end) run_end();
+}
 
 template <typename T>
 void UndirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {

@@ -47,11 +47,14 @@ class DirectedGraph {
 		edges = new List<DirectedEdge<T> *>();
 	}
 	
-	void init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser);
+	void init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler = DirectedGraph<T>::input_line_handler_1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
 	
 	void mark_all_vertices_unexplored();
-	void bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex);
+	void bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr);
+	void dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
+	
 	void shortest_path_by_edge_cardinality(Vertex<T> *s);
+	void topological_sorting();
 	
 	void disp();
 };
@@ -120,7 +123,7 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 	Queue<Vertex<T> *> *q = new Queue<Vertex<T> *>();
 	
 	q->enqueue(s);
-	handle_edge_and_vertex(nullptr, s);
+	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
 	s->explored = true;
 	
 	while (!q->empty()) {
@@ -131,7 +134,7 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 			Vertex<T> *adjacent_vertex = edge->second; 
 			if (adjacent_vertex->explored == false) {
 				q->enqueue(adjacent_vertex);
-				handle_edge_and_vertex(edge, adjacent_vertex);
+				if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
 				adjacent_vertex->explored = true;
 			}
 			edge = v->adjacencyList->traverse_next();
@@ -140,6 +143,46 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 	}
 }
 
+template <typename T>
+void DirectedGraph<T>::dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex, std::function<void(Vertex<T> *)> run_end) {
+	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
+	s->explored = true;
+	
+	Vertex<T> *v = s;
+	DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
+	while (edge) {
+		Vertex<T> *adjacent_vertex = edge->second; 
+		if (adjacent_vertex->explored == false) {
+			if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
+			adjacent_vertex->explored = true;
+			dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
+		}
+		edge = v->adjacencyList->traverse_next();
+	}
+	
+	if (run_end) run_end(s);
+}
+
+
+template <typename T>
+void DirectedGraph<T>::topological_sorting() {
+	mark_all_vertices_unexplored();
+	int topological_number = vertices->size();
+	
+	std::function<void(Vertex<T> *)> assign_topological_number =
+		[&topological_number] (Vertex<T> *v) -> void {
+					v->data->topological_order = --topological_number;
+		};
+	
+	Vertex<T> *v = vertices->traverse_init();
+	while (v) {
+		if (v->explored == false) {
+			dfs_from(v, nullptr, assign_topological_number);
+		}
+		
+		v = vertices->traverse_next();
+	}
+}
 
 template <typename T>
 void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
@@ -162,7 +205,7 @@ void DirectedGraph<T>::disp() {
 	Vertex<T> *v = vertices->traverse_init();
 	
 	while (v) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D" << v->data->distance << ", Adj:";
+		std::cout << "V" << v->value << ", X" << v->explored << ", D" << v->data->distance << ", T" << v->data->topological_order << ", Adj:";
 		
 		DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
 		while (edge) {

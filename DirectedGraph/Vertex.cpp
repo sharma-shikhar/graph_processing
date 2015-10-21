@@ -1,7 +1,8 @@
 class VertexExtraData {
   public:
 	double distance;
-	VertexExtraData() : distance(0) {}
+	int topological_order;
+	VertexExtraData() : distance(0), topological_order(-1) {}
 };
 
 template <typename T>
