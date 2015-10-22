@@ -2,9 +2,10 @@ template <typename T>
 class Node {
   public:
 	T data;
+	Node<T> *prev;
 	Node<T> *next;
-	Node(T data) : data(data), next(nullptr) {}
-	Node(T data, Node<T> *next) : data(data), next(next) {}
+	Node(T data) : data(data), prev(nullptr), next(nullptr) {}
+	Node(T data, Node<T> *prev, Node<T> *next) : data(data), prev(prev), next(next) {}
 };
 
 template <typename T>
@@ -19,7 +20,7 @@ class List {
 		Node<T> *n = this->head;
 		Node<T> *cur = nullptr;
 		while (n) {
-			cur  = n;
+			cur = n;
 			n = n->next;
 			delete cur;
 		}
@@ -30,6 +31,7 @@ class List {
 
 	T push_back(T data);
 	T pop_front();
+	Node<T> * move_to_front(Node<T> *);
 
 	T traverse_init() {
 		this->current_node = this->head;
@@ -77,6 +79,7 @@ T List<T>::pop_front() {
 		Node<T> *n = this->head;
 		T data = n->data;
 		this->head = this->head->next;
+		this->head->prev = nullptr;
 		delete n;
 		_size--;
 		return data; 
@@ -85,7 +88,7 @@ T List<T>::pop_front() {
 
 template <typename T>
 T List<T>::push_back(T data) {
-	Node<T> *n = new Node<T>(data, nullptr);
+	Node<T> *n = new Node<T>(data, tail, nullptr);
 	
 	if (this->empty()) {
 		this->head = this->tail = n;
@@ -96,4 +99,35 @@ T List<T>::push_back(T data) {
 	}
 	_size++;
 	return n->data;
+}
+
+template <typename T>
+Node<T> * List<T>::move_to_front(Node<T> *node_to_move) {
+	if (!node_to_move) {
+		throw -1;
+	}
+	
+	if (node_to_move == this->head) {
+		// do nothing
+	}
+	else if (node_to_move == this->tail) {
+		this->tail = this->tail->prev;
+		this->tail->next = nullptr;
+		
+		node_to_move->prev = nullptr;
+		node_to_move->next = this->head;
+		this->head->prev = node_to_move;
+		this->head = node_to_move;
+	}
+	else {
+		node_to_move->prev->next = node_to_move->next;
+		node_to_move->next->prev = node_to_move->prev;
+		
+		node_to_move->prev = nullptr;
+		node_to_move->next = this->head;
+		this->head->prev = node_to_move;
+		this->head = node_to_move;
+	}
+	
+	return node_to_move;
 }
