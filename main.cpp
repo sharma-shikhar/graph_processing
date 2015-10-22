@@ -13,7 +13,7 @@ int main() {
 	int number = 0;
 	std::function<void(DirectedEdge<int> *, Vertex<int> *)> labeler = [&number] (DirectedEdge<int> *e, Vertex<int> *v) -> void {
 		//cout << "Handling " << v->value << " ";
-		v->data->topological_order = number++;
+		v->data->data1 = number++;
 		
 	};
 	

@@ -227,7 +227,7 @@ void DirectedGraph<T>::disp() {
 	Vertex<T> *v = vertices->traverse_init();
 	
 	while (v) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D1" << v->data->data1 << ", D2" << v->data->data2 << ", Adj:";
+		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", Adj:";
 		
 		DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
 		while (edge) {
