@@ -1,8 +1,8 @@
 class VertexExtraData {
   public:
-	double distance;
-	int component_number;
-	VertexExtraData() : distance(0), component_number(-1) {}
+	int data1;
+	double data2;
+	VertexExtraData() : data1(-1), data2(-1) {}
 };
 
 template <typename T>

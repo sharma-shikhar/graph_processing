@@ -167,9 +167,9 @@ void UndirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
 	bfs_from(s, 
 		[] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
 			if (edge == nullptr) // seed vertex
-				vertex->data->distance = 0;
+				vertex->data->data2 = 0;
 			else
-				vertex->data->distance = edge->get_other_vertex(vertex)->data->distance + 1;
+				vertex->data->data2 = edge->get_other_vertex(vertex)->data->data2 + 1;
 		}
 	);
 }
@@ -184,7 +184,7 @@ void UndirectedGraph<T>::connected_components() {
 	int component_number = 0;
 	std::function<void(UndirectedEdge<T> *edge, Vertex<T> *vertex)> assign_component_number =
 		[&component_number] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
-					vertex->data->component_number = component_number;
+					vertex->data->data1 = component_number;
 		};
 		
 	while (v) {
@@ -204,7 +204,7 @@ void UndirectedGraph<T>::disp() {
 	Vertex<T> *v = vertices->traverse_init();
 	
 	while (v) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D" << v->data->distance << ", C" << v->data->component_number << ", Adj:";
+		std::cout << "V" << v->value << ", X" << v->explored << ", D1" << v->data->data1 << ", D2" << v->data->data2 << ", Adj:";
 		
 		UndirectedEdge<T> *edge = v->adjacencyList->traverse_init();
 		while (edge) {

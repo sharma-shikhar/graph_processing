@@ -9,7 +9,15 @@ int main() {
 	DirectedGraph<int> d;
 	d.init_with_file("input.txt");
 	
-	d.topological_sorting();
+	
+	int number = 0;
+	std::function<void(DirectedEdge<int> *, Vertex<int> *)> labeler = [&number] (DirectedEdge<int> *e, Vertex<int> *v) -> void {
+		//cout << "Handling " << v->value << " ";
+		v->data->topological_order = number++;
+		
+	};
+	
+	d.rev_dfs_from(d.get_vertex(3), labeler);
 	
 	d.disp();
 	
