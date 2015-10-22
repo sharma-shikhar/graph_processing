@@ -1,19 +1,21 @@
+template <typename T>
 class VertexExtraData {
   public:
-	int data1;
+  	int data1;
 	double data2;
-	VertexExtraData() : data1(-1), data2(-1) {}
+	Vertex<T> *data3;
+	VertexExtraData() : data1(-1), data2(-1), data3(nullptr) {}
 };
 
 template <typename T>
 class Vertex {
   public:
-  	VertexExtraData *data;
+  	VertexExtraData<T> *data;
 	T value;
 	bool explored;
 	List<UndirectedEdge<T> *> *adjacencyList;
 	Vertex(T value) : value(value), explored(false) {
-		data = new VertexExtraData();
+		data = new VertexExtraData<T>();
 		adjacencyList = new List<UndirectedEdge<T> *>;
 	}
 	static int parser(const std::string &str);
