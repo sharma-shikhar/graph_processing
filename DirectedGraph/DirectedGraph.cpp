@@ -1,5 +1,6 @@
 #include <fstream>
 #include <unordered_map>
+#include <vector>
 #include "header.hpp"
 #include "../Lib/List.cpp"
 #include "../Lib/Queue.cpp"
@@ -59,6 +60,7 @@ class DirectedGraph {
 	
 	void shortest_path_by_edge_cardinality(Vertex<T> *s);
 	void topological_sorting();
+	void strongly_connected_components(); 
 	
 	void disp();
 };
@@ -205,6 +207,50 @@ void DirectedGraph<T>::topological_sorting() {
 }
 
 
+template <typename T>
+void DirectedGraph<T>::strongly_connected_components() {
+	// Kosaraju's Two Pass Algorithm for finding Strongly Connected Components
+	
+	////////////////////////////////////////////////////////////
+	// run DFS  on the reverse graph
+	mark_all_vertices_unexplored();
+	std::vector<Vertex<T> *> vertices_ordered;
+	
+	std::function<void(Vertex<T> *)> add_vertex_to_list =
+		[&vertices_ordered] (Vertex<T> *v) -> void {
+					vertices_ordered.push_back(v);
+		};
+	
+	
+	Vertex<T> *v = vertices->traverse_init();
+	while (v) {
+		if (v->explored == false) {
+			rev_dfs_from(v, nullptr, add_vertex_to_list);
+		}
+		
+		v = vertices->traverse_next();
+	}
+	
+	/////////////////////////////////////////////////////////////
+	// run DFS again on the original graph according to vertices_ordered
+	mark_all_vertices_unexplored();
+
+	Vertex<T> *leader;
+	std::function<void(DirectedEdge<T> *, Vertex<T> *)> leader_labeler = 
+		[&leader] (DirectedEdge<T> *e, Vertex<T> *v) -> void {
+			v->data->data3 = leader;
+		};
+	
+	
+	for (int i=vertices_ordered.size()-1; i>=0; i--) {
+		if (vertices_ordered[i]->explored == false) {
+			leader = vertices_ordered[i];
+			dfs_from(leader, leader_labeler);
+		}
+		
+	}
+	
+}
 
 template <typename T>
 void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
@@ -227,7 +273,7 @@ void DirectedGraph<T>::disp() {
 	Vertex<T> *v = vertices->traverse_init();
 	
 	while (v) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", Adj:";
+		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
 		
 		DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
 		while (edge) {
