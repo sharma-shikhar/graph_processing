@@ -32,6 +32,10 @@ class List {
 	T push_back(T data);
 	T pop_front();
 	Node<T> * move_to_front(Node<T> *);
+	
+	Node<T> * traverse_init_pack() {
+		return (this->current_node = this->head);
+	}
 
 	T traverse_init() {
 		this->current_node = this->head;
@@ -40,6 +44,13 @@ class List {
 			return this->current_node->data;
 		else
 			return nullptr; 
+	}
+
+	Node<T> * traverse_next_pack() {
+		if (this->current_node)
+			return (this->current_node = this->current_node->next);
+		else
+			return nullptr;
 	}
 
 	T traverse_next() {
@@ -54,6 +65,9 @@ class List {
 			return nullptr;
 	}
 	
+	Node<T> * traverse_current_pack() {
+		return this->current_node;
+	}
 
 	T traverse_current() {
 		if (this->current_node)
