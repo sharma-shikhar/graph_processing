@@ -12,12 +12,14 @@ class Vertex {
 	T value;
 	bool explored;
 	List<DirectedEdge<T> *> *adjacencyList;
+	List<DirectedEdge<T> *> *incomingEdgesList;
 	Vertex(T value) : value(value), explored(false) {
 		data = new VertexExtraData();
 		adjacencyList = new List<DirectedEdge<T> *>;
+		incomingEdgesList = new List<DirectedEdge<T> *>;
 	}
 	static int parser(const std::string &str);
-	~Vertex() {delete adjacencyList;}
+	~Vertex() {delete adjacencyList; delete incomingEdgesList;}
 };
 
 template <typename T>

@@ -34,6 +34,9 @@ class DirectedGraph {
 	DirectedEdge<T> *add_edge_to_adjacency_list(DirectedEdge<T> *e, Vertex<T> *v) {
 		v->adjacencyList->push_back(e);
 	}
+	DirectedEdge<T> *add_edge_to_incoming_edges_list(DirectedEdge<T> *e, Vertex<T> *v) {
+		v->incomingEdgesList->push_back(e);
+	}
 	
 	DirectedEdge<T> *create_edge(Vertex<T> *v1, Vertex<T> *v2) {
 		return new DirectedEdge<T>(v1, v2);
@@ -76,6 +79,7 @@ void DirectedGraph<T>::input_line_handler_1(DirectedGraph<T> *g, std::string &li
 		
 		DirectedEdge<T> *e = g->insert_edge(g->create_edge(v, w));
 		g->add_edge_to_adjacency_list(e, v);
+		g->add_edge_to_incoming_edges_list(e, w);
 	}
 	else {
 		T vertexData = parser(line);
@@ -211,6 +215,13 @@ void DirectedGraph<T>::disp() {
 		while (edge) {
 			std::cout << edge->second->value << " ";
 			edge = v->adjacencyList->traverse_next();
+		}
+		
+		std::cout << ", Inc:";
+		edge = v->incomingEdgesList->traverse_init();
+		while (edge) {
+			std::cout << edge->first->value << " ";
+			edge = v->incomingEdgesList->traverse_next();
 		}
 		
 		v = vertices->traverse_next();
