@@ -109,10 +109,8 @@ void UndirectedGraph<T>::init_with_file(const std::string filename, std::functio
 
 template <typename T>
 void UndirectedGraph<T>::mark_all_vertices_unexplored() {
-	Vertex<T> *v = vertices->traverse_init();
-	while (v) {		
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
 		v->explored = false;
-		v = vertices->traverse_next();
 	}
 }
 
@@ -127,18 +125,18 @@ void UndirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(UndirectedEdg
 	while (!q->empty()) {
 		Vertex<T> *v = q->dequeue();
 		
-		UndirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-		while (edge) {
+		for (UndirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
 			Vertex<T> *adjacent_vertex = edge->get_other_vertex(v); 
-			if (adjacent_vertex->explored == false) {
+			
+			if (!adjacent_vertex->explored) {
 				q->enqueue(adjacent_vertex);
 				if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
 				adjacent_vertex->explored = true;
 			}
-			edge = v->adjacencyList->traverse_next();
-		}
 		
+		}	
 	}
+	
 }
 
 template <typename T>
@@ -147,16 +145,13 @@ void UndirectedGraph<T>::dfs_from(Vertex<T> *s, std::function<void(UndirectedEdg
 	s->explored = true;
 	
 	Vertex<T> *v = s;
-	UndirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-	while (edge) {
+	
+	for (UndirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
 		Vertex<T> *adjacent_vertex = edge->get_other_vertex(v); 
-		if (adjacent_vertex->explored == false) {
-			if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
-			adjacent_vertex->explored = true;
+		if (!adjacent_vertex->explored)
 			dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
-		}
-		edge = v->adjacencyList->traverse_next();
 	}
+	
 	if (run_end) run_end();
 }
 
@@ -179,21 +174,17 @@ template <typename T>
 void UndirectedGraph<T>::connected_components() {
 	mark_all_vertices_unexplored();
 	
-	Vertex<T> *v = vertices->traverse_init();
-	
 	int component_number = 0;
 	std::function<void(UndirectedEdge<T> *edge, Vertex<T> *vertex)> assign_component_number =
 		[&component_number] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
 					vertex->data->data1 = component_number;
 		};
 		
-	while (v) {
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
 		if (!v->explored) {
 			bfs_from(v, assign_component_number);
 			component_number++;
 		}
-		
-		v = vertices->traverse_next();
 	}
 	
 }
@@ -201,18 +192,12 @@ void UndirectedGraph<T>::connected_components() {
 template <typename T>
 void UndirectedGraph<T>::disp() {
 	
-	Vertex<T> *v = vertices->traverse_init();
-	
-	while (v) {		
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {		
 		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
 		
-		UndirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-		while (edge) {
+		for (UndirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next())
 			std::cout << edge->get_other_vertex(v)->value << " ";
-			edge = v->adjacencyList->traverse_next();
-		}
 		
-		v = vertices->traverse_next();
 		std::cout << std::endl;
 	}
 	

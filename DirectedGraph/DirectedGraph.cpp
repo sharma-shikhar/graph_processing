@@ -118,11 +118,8 @@ void DirectedGraph<T>::init_with_file(const std::string filename, std::function<
 
 template <typename T>
 void DirectedGraph<T>::mark_all_vertices_unexplored() {
-	Vertex<T> *v = vertices->traverse_init();
-	while (v) {		
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next())
 		v->explored = false;
-		v = vertices->traverse_next();
-	}
 }
 
 template <typename T>
@@ -136,18 +133,16 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 	while (!q->empty()) {
 		Vertex<T> *v = q->dequeue();
 		
-		DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-		while (edge) {
+		for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
 			Vertex<T> *adjacent_vertex = edge->second; 
-			if (adjacent_vertex->explored == false) {
+			if (!adjacent_vertex->explored) {
 				q->enqueue(adjacent_vertex);
 				if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
 				adjacent_vertex->explored = true;
 			}
-			edge = v->adjacencyList->traverse_next();
 		}
-		
 	}
+	
 }
 
 template <typename T>
@@ -156,13 +151,11 @@ void DirectedGraph<T>::dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 	s->explored = true;
 	
 	Vertex<T> *v = s;
-	DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-	while (edge) {
+	
+	for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
 		Vertex<T> *adjacent_vertex = edge->second;
-		if (adjacent_vertex->explored == false) {
+		if (!adjacent_vertex->explored)
 			dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
-		}
-		edge = v->adjacencyList->traverse_next();
 	}
 	
 	if (run_end) run_end(s);
@@ -174,13 +167,11 @@ void DirectedGraph<T>::rev_dfs_from(Vertex<T> *s, std::function<void(DirectedEdg
 	s->explored = true;
 	
 	Vertex<T> *v = s;
-	DirectedEdge<T> *edge = v->incomingEdgesList->traverse_init();
-	while (edge) {
+	
+	for (DirectedEdge<T> *edge = v->incomingEdgesList->traverse_init(); edge; edge = v->incomingEdgesList->traverse_next()) {
 		Vertex<T> *adjacent_vertex = edge->first; 
-		if (adjacent_vertex->explored == false) {
+		if (!adjacent_vertex->explored)
 			rev_dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
-		}
-		edge = v->incomingEdgesList->traverse_next();
 	}
 	
 	if (run_end) run_end(s);
@@ -196,14 +187,12 @@ void DirectedGraph<T>::topological_sorting() {
 					v->data->data1 = --topological_number;
 		};
 	
-	Vertex<T> *v = vertices->traverse_init();
-	while (v) {
-		if (v->explored == false) {
+	
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
+		if (!v->explored)
 			dfs_from(v, nullptr, assign_topological_number);
-		}
-		
-		v = vertices->traverse_next();
 	}
+	
 }
 
 
@@ -221,14 +210,9 @@ void DirectedGraph<T>::strongly_connected_components() {
 					vertices_ordered.push_back(v);
 		};
 	
-	
-	Vertex<T> *v = vertices->traverse_init();
-	while (v) {
-		if (v->explored == false) {
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
+		if (!v->explored)
 			rev_dfs_from(v, nullptr, add_vertex_to_list);
-		}
-		
-		v = vertices->traverse_next();
 	}
 	
 	/////////////////////////////////////////////////////////////
@@ -243,11 +227,10 @@ void DirectedGraph<T>::strongly_connected_components() {
 	
 	
 	for (int i=vertices_ordered.size()-1; i>=0; i--) {
-		if (vertices_ordered[i]->explored == false) {
+		if (!vertices_ordered[i]->explored) {
 			leader = vertices_ordered[i];
 			dfs_from(leader, leader_labeler);
 		}
-		
 	}
 	
 }
@@ -258,11 +241,10 @@ void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
 	
 	bfs_from(s, 
 	[] (DirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
-		if (edge == nullptr) { // seed vertex
+		if (edge == nullptr) // seed vertex
 			vertex->data->data2 = 0;
-		} else {
+		else
 			vertex->data->data2 = edge->first->data->data2 + 1;
-		}
 	}
 	);
 }
@@ -270,25 +252,18 @@ void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
 template <typename T>
 void DirectedGraph<T>::disp() {
 	
-	Vertex<T> *v = vertices->traverse_init();
-	
-	while (v) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
+	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {		
 		
-		DirectedEdge<T> *edge = v->adjacencyList->traverse_init();
-		while (edge) {
+		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
+				
+		for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next())
 			std::cout << edge->second->value << " ";
-			edge = v->adjacencyList->traverse_next();
-		}
 		
 		std::cout << ", Inc:";
-		edge = v->incomingEdgesList->traverse_init();
-		while (edge) {
-			std::cout << edge->first->value << " ";
-			edge = v->incomingEdgesList->traverse_next();
-		}
 		
-		v = vertices->traverse_next();
+		for (DirectedEdge<T> *edge = v->incomingEdgesList->traverse_init(); edge; edge = v->incomingEdgesList->traverse_next())
+			std::cout << edge->first->value << " ";
+		
 		std::cout << std::endl;
 	}
 	
