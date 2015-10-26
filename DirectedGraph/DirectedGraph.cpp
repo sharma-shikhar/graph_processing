@@ -5,6 +5,7 @@
 #include "../Lib/List.cpp"
 #include "../Lib/Queue.cpp"
 #include "../Lib/string_funcs.cpp"
+#include "../Lib/MinHeap.cpp"
 #include "Vertex.cpp"
 #include "DirectedEdge.cpp"
 
