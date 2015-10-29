@@ -14,7 +14,7 @@ class MinHeap {
 	void bubble_up(int i);
   public:
 	int size() {return arr.size();}
-	bool empty() {return arr.size() == 0;}
+	bool isEmpty() {return arr.size() == 0;}
 	MinHeap() {}
 	std::pair<K,V> insert(std::pair<K,V> p);
 	std::pair<K,V> insert(K key, V val);

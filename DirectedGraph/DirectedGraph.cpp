@@ -14,61 +14,61 @@ template <typename T>
 class DirectedGraph {
 	public:
 	
-	static void input_line_handler_1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
+	static void inputLineHandler1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
 	
 	List<Vertex<T> *> *vertices;
 	List<DirectedEdge<T> *> *edges;
-	std::unordered_map<T, Vertex<T> *> mapper;
+	std::unordered_map<T, Vertex<T> *> valueToVertexMapper;
 	
 	bool vertex_exists(const T &val) {
-		return mapper.find(val) != mapper.end();
+		return valueToVertexMapper.find(val) != valueToVertexMapper.end();
 	}
-	Vertex<T> *get_vertex(const T &val) {
-		return mapper[val];
+	Vertex<T> *getVertex(const T &val) {
+		return valueToVertexMapper[val];
 	}
 	
-	Vertex<T> *create_vertex(T value) {
+	Vertex<T> *createVertex(T value) {
 		return new Vertex<T>(value);
 	}
-	Vertex<T> *insert_vertex(Vertex<T> *v) {
-		return vertices->push_back(v);
+	Vertex<T> *insertVertex(Vertex<T> *v) {
+		return vertices->pushBack(v);
 	}
-	DirectedEdge<T> *add_edge_to_adjacency_list(DirectedEdge<T> *e, Vertex<T> *v) {
-		v->adjacencyList->push_back(e);
+	DirectedEdge<T> *addEdgeToAdjacencyList(DirectedEdge<T> *e, Vertex<T> *v) {
+		v->adjacencyList->pushBack(e);
 	}
-	DirectedEdge<T> *add_edge_to_incoming_edges_list(DirectedEdge<T> *e, Vertex<T> *v) {
-		v->incomingEdgesList->push_back(e);
+	DirectedEdge<T> *addEdgeToIncomingEdgesList(DirectedEdge<T> *e, Vertex<T> *v) {
+		v->incomingEdgesList->pushBack(e);
 	}
 	
-	DirectedEdge<T> *create_edge(Vertex<T> *v1, Vertex<T> *v2) {
+	DirectedEdge<T> *createEdge(Vertex<T> *v1, Vertex<T> *v2) {
 		return new DirectedEdge<T>(v1, v2);
 	}
-	DirectedEdge<T> *insert_edge(DirectedEdge<T> *e) {
-		return edges->push_back(e);
+	DirectedEdge<T> *insertEdge(DirectedEdge<T> *e) {
+		return edges->pushBack(e);
 	}
-	Vertex<T> *get_or_create_vertex(T val);
+	Vertex<T> *getOrCreateVertex(T val);
 	DirectedGraph() {
 		vertices = new List<Vertex<T> *>();
 		edges = new List<DirectedEdge<T> *>();
 	}
 	
-	void init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler = DirectedGraph<T>::input_line_handler_1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
+	void initWithFile(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> inputLineHandler = DirectedGraph<T>::inputLineHandler1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
 	
-	void mark_all_vertices_unexplored();
-	void bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr);
-	void dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
-	void rev_dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
+	void markAllVerticesUnexplored();
+	void breadthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex = nullptr);
+	void depthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
+	void reverseDepthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
 	
-	void shortest_path_by_edge_cardinality(Vertex<T> *s);
-	void topological_sorting();
-	void strongly_connected_components(); 
+	void shortestPathByEdgeCardinality(Vertex<T> *s);
+	void topologicalSorting();
+	void stronglyConnectedComponents(); 
 	
 	void disp();
 };
 
 
 template <typename T>
-void DirectedGraph<T>::input_line_handler_1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser) {
+void DirectedGraph<T>::inputLineHandler1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser) {
 	trim(line);
 	if (line.size() == 0) return;
 	
@@ -78,31 +78,31 @@ void DirectedGraph<T>::input_line_handler_1(DirectedGraph<T> *g, std::string &li
 		T vData = parser(line.substr(0, tab_pos));
 		T wData = parser(line.substr(tab_pos + 1));
 		
-		Vertex<T> *v = g->get_or_create_vertex(vData);
-		Vertex<T> *w = g->get_or_create_vertex(wData);
+		Vertex<T> *v = g->getOrCreateVertex(vData);
+		Vertex<T> *w = g->getOrCreateVertex(wData);
 		
-		DirectedEdge<T> *e = g->insert_edge(g->create_edge(v, w));
-		g->add_edge_to_adjacency_list(e, v);
-		g->add_edge_to_incoming_edges_list(e, w);
+		DirectedEdge<T> *e = g->insertEdge(g->createEdge(v, w));
+		g->addEdgeToAdjacencyList(e, v);
+		g->addEdgeToIncomingEdgesList(e, w);
 	}
 	else {
 		T vertexData = parser(line);
-		g->get_or_create_vertex(vertexData);
+		g->getOrCreateVertex(vertexData);
 	}
 }
 
 template <typename T>
-Vertex<T> * DirectedGraph<T>::get_or_create_vertex(T val) {
+Vertex<T> * DirectedGraph<T>::getOrCreateVertex(T val) {
 	if (!vertex_exists(val)) {
-		return mapper[val] = insert_vertex(create_vertex(val));
+		return valueToVertexMapper[val] = insertVertex(createVertex(val));
 	}
 	else {
-		return mapper[val];
+		return valueToVertexMapper[val];
 	}
 }
 
 template <typename T>
-void DirectedGraph<T>::init_with_file(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> input_line_handler, std::function<T(const std::string &)> parser) {
+void DirectedGraph<T>::initWithFile(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> inputLineHandler, std::function<T(const std::string &)> parser) {
 	std::string line;
 	std::ifstream myfile(filename);
 	
@@ -111,34 +111,34 @@ void DirectedGraph<T>::init_with_file(const std::string filename, std::function<
 	}
 	else {
 		while (getline(myfile, line)) {
-			input_line_handler(this, line, parser);
+			inputLineHandler(this, line, parser);
 		}
 	}
 	
 }
 
 template <typename T>
-void DirectedGraph<T>::mark_all_vertices_unexplored() {
-	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next())
+void DirectedGraph<T>::markAllVerticesUnexplored() {
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext())
 		v->explored = false;
 }
 
 template <typename T>
-void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex) {
+void DirectedGraph<T>::breadthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex) {
 	Queue<Vertex<T> *> *q = new Queue<Vertex<T> *>();
 	
 	q->enqueue(s);
-	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
+	if (handleEdgeAndVertex) handleEdgeAndVertex(nullptr, s);
 	s->explored = true;
 	
-	while (!q->empty()) {
+	while (!q->isEmpty()) {
 		Vertex<T> *v = q->dequeue();
 		
-		for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
+		for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext()) {
 			Vertex<T> *adjacent_vertex = edge->second; 
 			if (!adjacent_vertex->explored) {
 				q->enqueue(adjacent_vertex);
-				if (handle_edge_and_vertex) handle_edge_and_vertex(edge, adjacent_vertex);
+				if (handleEdgeAndVertex) handleEdgeAndVertex(edge, adjacent_vertex);
 				adjacent_vertex->explored = true;
 			}
 		}
@@ -147,40 +147,40 @@ void DirectedGraph<T>::bfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T>
 }
 
 template <typename T>
-void DirectedGraph<T>::dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex, std::function<void(Vertex<T> *)> run_end) {
-	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
+void DirectedGraph<T>::depthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex, std::function<void(Vertex<T> *)> run_end) {
+	if (handleEdgeAndVertex) handleEdgeAndVertex(nullptr, s);
 	s->explored = true;
 	
 	Vertex<T> *v = s;
 	
-	for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next()) {
+	for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext()) {
 		Vertex<T> *adjacent_vertex = edge->second;
 		if (!adjacent_vertex->explored)
-			dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
+			depthFirstSearch(adjacent_vertex, handleEdgeAndVertex, run_end);
 	}
 	
 	if (run_end) run_end(s);
 }
 
 template <typename T>
-void DirectedGraph<T>::rev_dfs_from(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handle_edge_and_vertex, std::function<void(Vertex<T> *)> run_end) {
-	if (handle_edge_and_vertex) handle_edge_and_vertex(nullptr, s);
+void DirectedGraph<T>::reverseDepthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex, std::function<void(Vertex<T> *)> run_end) {
+	if (handleEdgeAndVertex) handleEdgeAndVertex(nullptr, s);
 	s->explored = true;
 	
 	Vertex<T> *v = s;
 	
-	for (DirectedEdge<T> *edge = v->incomingEdgesList->traverse_init(); edge; edge = v->incomingEdgesList->traverse_next()) {
+	for (DirectedEdge<T> *edge = v->incomingEdgesList->traverseInit(); edge; edge = v->incomingEdgesList->traverseNext()) {
 		Vertex<T> *adjacent_vertex = edge->first; 
 		if (!adjacent_vertex->explored)
-			rev_dfs_from(adjacent_vertex, handle_edge_and_vertex, run_end);
+			reverseDepthFirstSearch(adjacent_vertex, handleEdgeAndVertex, run_end);
 	}
 	
 	if (run_end) run_end(s);
 }
 
 template <typename T>
-void DirectedGraph<T>::topological_sorting() {
-	mark_all_vertices_unexplored();
+void DirectedGraph<T>::topologicalSorting() {
+	markAllVerticesUnexplored();
 	int topological_number = vertices->size();
 	
 	std::function<void(Vertex<T> *)> assign_topological_number =
@@ -189,21 +189,21 @@ void DirectedGraph<T>::topological_sorting() {
 		};
 	
 	
-	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {
 		if (!v->explored)
-			dfs_from(v, nullptr, assign_topological_number);
+			depthFirstSearch(v, nullptr, assign_topological_number);
 	}
 	
 }
 
 
 template <typename T>
-void DirectedGraph<T>::strongly_connected_components() {
+void DirectedGraph<T>::stronglyConnectedComponents() {
 	// Kosaraju's Two Pass Algorithm for finding Strongly Connected Components
 	
 	////////////////////////////////////////////////////////////
 	// run DFS  on the reverse graph
-	mark_all_vertices_unexplored();
+	markAllVerticesUnexplored();
 	std::vector<Vertex<T> *> vertices_ordered;
 	
 	std::function<void(Vertex<T> *)> add_vertex_to_list =
@@ -211,14 +211,14 @@ void DirectedGraph<T>::strongly_connected_components() {
 					vertices_ordered.push_back(v);
 		};
 	
-	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {
 		if (!v->explored)
-			rev_dfs_from(v, nullptr, add_vertex_to_list);
+			reverseDepthFirstSearch(v, nullptr, add_vertex_to_list);
 	}
 	
 	/////////////////////////////////////////////////////////////
 	// run DFS again on the original graph according to vertices_ordered
-	mark_all_vertices_unexplored();
+	markAllVerticesUnexplored();
 
 	Vertex<T> *leader;
 	std::function<void(DirectedEdge<T> *, Vertex<T> *)> leader_labeler = 
@@ -230,17 +230,17 @@ void DirectedGraph<T>::strongly_connected_components() {
 	for (int i=vertices_ordered.size()-1; i>=0; i--) {
 		if (!vertices_ordered[i]->explored) {
 			leader = vertices_ordered[i];
-			dfs_from(leader, leader_labeler);
+			depthFirstSearch(leader, leader_labeler);
 		}
 	}
 	
 }
 
 template <typename T>
-void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
-	mark_all_vertices_unexplored();
+void DirectedGraph<T>::shortestPathByEdgeCardinality(Vertex<T> *s) {
+	markAllVerticesUnexplored();
 	
-	bfs_from(s, 
+	breadthFirstSearch(s, 
 	[] (DirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
 		if (edge == nullptr) // seed vertex
 			vertex->data->data2 = 0;
@@ -253,16 +253,16 @@ void DirectedGraph<T>::shortest_path_by_edge_cardinality(Vertex<T> *s) {
 template <typename T>
 void DirectedGraph<T>::disp() {
 	
-	for (Vertex<T> *v = vertices->traverse_init(); v; v = vertices->traverse_next()) {		
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {		
 		
 		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
 				
-		for (DirectedEdge<T> *edge = v->adjacencyList->traverse_init(); edge; edge = v->adjacencyList->traverse_next())
+		for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext())
 			std::cout << edge->second->value << " ";
 		
 		std::cout << ", Inc:";
 		
-		for (DirectedEdge<T> *edge = v->incomingEdgesList->traverse_init(); edge; edge = v->incomingEdgesList->traverse_next())
+		for (DirectedEdge<T> *edge = v->incomingEdgesList->traverseInit(); edge; edge = v->incomingEdgesList->traverseNext())
 			std::cout << edge->first->value << " ";
 		
 		std::cout << std::endl;

@@ -26,18 +26,18 @@ class List {
 		}
 		_size = 0;
 	}
-	bool empty() {return head == nullptr;}
+	bool isEmpty() {return head == nullptr;}
 	int size() {return _size;}
 
-	T push_back(T data);
-	T pop_front();
-	Node<T> * move_to_front(Node<T> *);
+	T pushBack(T data);
+	T popFront();
+	Node<T> * moveToFront(Node<T> *);
 	
-	Node<T> * traverse_init_pack() {
+	Node<T> * traverseInitPack() {
 		return (this->current_node = this->head);
 	}
 
-	T traverse_init() {
+	T traverseInit() {
 		this->current_node = this->head;
 		
 		if (this->current_node)
@@ -46,14 +46,14 @@ class List {
 			return nullptr; 
 	}
 
-	Node<T> * traverse_next_pack() {
+	Node<T> * traverseNextPack() {
 		if (this->current_node)
 			return (this->current_node = this->current_node->next);
 		else
 			return nullptr;
 	}
 
-	T traverse_next() {
+	T traverseNext() {
 		if (this->current_node) {
 			this->current_node = this->current_node->next;
 			if (this->current_node)
@@ -65,11 +65,11 @@ class List {
 			return nullptr;
 	}
 	
-	Node<T> * traverse_current_pack() {
+	Node<T> * traverseCurrentPack() {
 		return this->current_node;
 	}
 
-	T traverse_current() {
+	T traverseCurrent() {
 		if (this->current_node)
 			return this->current_node->data;
 		else
@@ -78,8 +78,8 @@ class List {
 };
 
 template <typename T>
-T List<T>::pop_front() {
-	if (this->empty()) {
+T List<T>::popFront() {
+	if (this->isEmpty()) {
 		throw -1;
 	}
 	else if (this->head == this->tail) {
@@ -101,10 +101,10 @@ T List<T>::pop_front() {
 }
 
 template <typename T>
-T List<T>::push_back(T data) {
+T List<T>::pushBack(T data) {
 	Node<T> *n = new Node<T>(data, tail, nullptr);
 	
-	if (this->empty()) {
+	if (this->isEmpty()) {
 		this->head = this->tail = n;
 	}
 	else {
@@ -116,7 +116,7 @@ T List<T>::push_back(T data) {
 }
 
 template <typename T>
-Node<T> * List<T>::move_to_front(Node<T> *node_to_move) {
+Node<T> * List<T>::moveToFront(Node<T> *node_to_move) {
 	if (!node_to_move) {
 		throw -1;
 	}

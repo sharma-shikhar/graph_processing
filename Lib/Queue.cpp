@@ -5,17 +5,17 @@ class Queue {
 	Queue() {
 		q = new List<T>();
 	}
-	bool empty() {return q->empty();}
+	bool isEmpty() {return q->isEmpty();}
 	T enqueue(T data);
 	T dequeue();
 };
 
 template <typename T>
 T Queue<T>::enqueue(T data) {
-	return q->push_back(data);
+	return q->pushBack(data);
 }
 
 template <typename T>
 T Queue<T>::dequeue() {
-	return q->pop_front();
+	return q->popFront();
 }
