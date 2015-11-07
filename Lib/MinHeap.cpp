@@ -3,6 +3,7 @@
 template <typename K, typename V>
 class MinHeap {
 	std::vector<std::pair<K,V>> arr;
+	std::unordered_map<V, int> elementToIndexMapper;
 	
 	int par(int ch) {return (ch-1)/2;}
 	int l_ch(int par) {return 2*par + 1;}
@@ -10,16 +11,23 @@ class MinHeap {
 	
 	void swap(int i, int j);
 	
-	void max_heapify(int i);
-	void bubble_up(int i);
+	int maxHeapify(int i);
+	int bubbleUp(int i);
+	
+	void updateElementIndexInMapper(V element, int index) {elementToIndexMapper[element] = index;}
+	void deleteElementFromMapper(V element) {elementToIndexMapper.erase(element);}
+	void insertElementInMapper(V element, int index) {elementToIndexMapper[element] = index;}
   public:
 	int size() {return arr.size();}
 	bool isEmpty() {return arr.size() == 0;}
+	bool elementExists(V element) {return elementToIndexMapper.find(element) != elementToIndexMapper.end();}
+	
 	MinHeap() {}
 	std::pair<K,V> insert(std::pair<K,V> p);
 	std::pair<K,V> insert(K key, V val);
-	std::pair<K,V> extract_min();
-	std::pair<K,V> peek_min();
+	std::pair<K,V> extractMin();
+	std::pair<K,V> peekMin();
+	void disp();
 };
 
 template <typename K, typename V>
@@ -32,7 +40,8 @@ void MinHeap<K,V>::swap(int i, int j) {
 template <typename K, typename V>
 std::pair<K,V> MinHeap<K,V>::insert(std::pair<K,V> p) {
 	arr.push_back(p);
-	bubble_up(arr.size() - 1);
+	insertElementInMapper(p.second, arr.size()-1);
+	bubbleUp(arr.size() - 1);
 	return p;
 }
 
@@ -42,24 +51,25 @@ std::pair<K,V> MinHeap<K,V>::insert(K key, V val) {
 }
 
 template <typename K, typename V>
-std::pair<K,V> MinHeap<K,V>::extract_min() {
+std::pair<K,V> MinHeap<K,V>::extractMin() {
 	std::pair<K,V> min = arr[0];
 	std::pair<K,V> last_el = arr[arr.size()-1];
 	arr.pop_back();
 	if (arr.size() > 0) {
 		arr[0] = last_el;
-		max_heapify(0);
+		maxHeapify(0);
 	}
+	deleteElementFromMapper(min.second);
 	return min;
 }
 
 template <typename K, typename V>
-std::pair<K,V> MinHeap<K,V>::peek_min() {
+std::pair<K,V> MinHeap<K,V>::peekMin() {
 	return arr[0];
 }
 
 template <typename K, typename V>
-void MinHeap<K,V>::max_heapify(int i) {
+int MinHeap<K,V>::maxHeapify(int i) {
 	int l = l_ch(i);
 	int r = r_ch(i);
 	int smallest;
@@ -77,15 +87,21 @@ void MinHeap<K,V>::max_heapify(int i) {
 	
 	if (smallest != i) {
 		swap(i, smallest);
-		max_heapify(smallest);
+		updateElementIndexInMapper(arr[i].second, i);
+		updateElementIndexInMapper(arr[smallest].second, smallest);
+		return maxHeapify(smallest);
 	}
 	
+	return i;
 }
 
 template <typename K, typename V>
-void MinHeap<K,V>::bubble_up(int i) {
+int MinHeap<K,V>::bubbleUp(int i) {
 	while (par(i) >= 0 && arr[i].first < arr[par(i)].first) {
 		swap(i, par(i));
+		updateElementIndexInMapper(arr[i].second, i);
+		updateElementIndexInMapper(arr[par(i)].second, par(i));
 		i = par(i);
 	}
+	return i;
 }
