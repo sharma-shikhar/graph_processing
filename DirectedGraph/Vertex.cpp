@@ -1,10 +1,12 @@
 template <typename T>
 class VertexExtraData {
   public:
-  	int data1;
-	double data2;
-	Vertex<T> *data3;
-	VertexExtraData() : data1(-1), data2(-1), data3(nullptr) {}
+	
+	int data_int_1;
+	double data_double_1;
+	Vertex<T> *data_pointer_to_vertex_1;
+	
+	VertexExtraData() : data_int_1(-1), data_double_1(-1), data_pointer_to_vertex_1(nullptr) {}
 };
 
 template <typename T>

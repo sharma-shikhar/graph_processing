@@ -5,16 +5,16 @@
 
 using namespace std;
 int main() {
-	/*
+	
 	DirectedGraph<int> d;
 	d.initWithFile("input.txt");
 	
 	d.stronglyConnectedComponents();
 	
 	d.disp();
-	*/
 	
 	
+	/*
 	MinHeap<int, int> h;
 	
 	for (int i=9; i>=1; i--) {
@@ -28,6 +28,7 @@ int main() {
 	std::pair<int, int> p = h.extractMin();
 	
 	cout << p.first << " " << p.second;
+	*/
 	
 	return 0;
 }

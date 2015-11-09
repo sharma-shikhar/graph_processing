@@ -187,7 +187,7 @@ void DirectedGraph<T>::topologicalSorting() {
 	
 	std::function<void(Vertex<T> *)> assign_topological_number =
 		[&topological_number] (Vertex<T> *v) -> void {
-					v->data->data1 = --topological_number;
+					v->data->data_int_1 = --topological_number;
 		};
 	
 	
@@ -225,7 +225,7 @@ void DirectedGraph<T>::stronglyConnectedComponents() {
 	Vertex<T> *leader;
 	std::function<void(DirectedEdge<T> *, Vertex<T> *)> leader_labeler = 
 		[&leader] (DirectedEdge<T> *e, Vertex<T> *v) -> void {
-			v->data->data3 = leader;
+			v->data->data_pointer_to_vertex_1 = leader;
 		};
 	
 	
@@ -245,19 +245,22 @@ void DirectedGraph<T>::shortestPathByEdgeCardinality(Vertex<T> *s) {
 	breadthFirstSearch(s, 
 	[] (DirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
 		if (edge == nullptr) // seed vertex
-			vertex->data->data2 = 0;
+			vertex->data->data_double_1 = 0;
 		else
-			vertex->data->data2 = edge->first->data->data2 + 1;
+			vertex->data->data_double_1 = edge->first->data->data_double_1 + 1;
 	}
 	);
 }
 
+
+
 template <typename T>
 void DirectedGraph<T>::disp() {
 	
-	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {		
-		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {			
+		std::cout << "V" << v->value << ", X" << v->explored << ", DI1:" << v->data->data_int_1 
+				  << ", DB1:" << v->data->data_double_1  
+				  << ", DP1:" << v->data->data_pointer_to_vertex_1->value << ", Adj:";
 				
 		for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext())
 			std::cout << edge->second->value << " ";

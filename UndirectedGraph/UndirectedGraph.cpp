@@ -165,9 +165,9 @@ void UndirectedGraph<T>::shortestPathByEdgeCardinality(Vertex<T> *s) {
 	breadthFirstSearch(s, 
 		[] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
 			if (edge == nullptr) // seed vertex
-				vertex->data->data2 = 0;
+				vertex->data->data_double_1 = 0;
 			else
-				vertex->data->data2 = edge->getOtherVertex(vertex)->data->data2 + 1;
+				vertex->data->data_double_1 = edge->getOtherVertex(vertex)->data->data_double_1 + 1;
 		}
 	);
 }
@@ -180,7 +180,7 @@ void UndirectedGraph<T>::connectedComponents() {
 	int component_number = 0;
 	std::function<void(UndirectedEdge<T> *edge, Vertex<T> *vertex)> assign_component_number =
 		[&component_number] (UndirectedEdge<T> *edge, Vertex<T> *vertex) -> void {
-					vertex->data->data1 = component_number;
+					vertex->data->data_int_1 = component_number;
 		};
 		
 	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {
@@ -196,7 +196,9 @@ template <typename T>
 void UndirectedGraph<T>::disp() {
 	
 	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {		
-		std::cout << "V" << v->value << ", X" << v->explored << ", D1:" << v->data->data1 << ", D2:" << v->data->data2 << ", D3:" << v->data->data3->value << ", Adj:";
+		std::cout << "V" << v->value << ", X" << v->explored << ", DI1:" << v->data->data_int_1  
+				  << ", DB1:" << v->data->data_double_1  
+				  << ", DP1:" << v->data->data_pointer_to_vertex_1->value << ", Adj:";
 		
 		for (UndirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext())
 			std::cout << edge->getOtherVertex(v)->value << " ";
