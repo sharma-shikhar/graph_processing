@@ -1,6 +1,7 @@
 #include <fstream>
 #include <unordered_map>
 #include <vector>
+#include <limits>
 #include "header.hpp"
 #include "../Lib/List.cpp"
 #include "../Lib/Queue.cpp"
@@ -44,8 +45,8 @@ class DirectedGraph {
 		v->incomingEdgesList->pushBack(e);
 	}
 	
-	DirectedEdge<T> *createEdge(Vertex<T> *v1, Vertex<T> *v2) {
-		return new DirectedEdge<T>(v1, v2);
+	DirectedEdge<T> *createEdge(Vertex<T> *v1, Vertex<T> *v2, double weight = 1) {
+		return new DirectedEdge<T>(v1, v2, weight);
 	}
 	DirectedEdge<T> *insertEdge(DirectedEdge<T> *e) {
 		return edges->pushBack(e);
@@ -62,6 +63,7 @@ class DirectedGraph {
 	void reverseDepthFirstSearch(Vertex<T> *s, std::function<void(DirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex = nullptr, std::function<void(Vertex<T> *)> run_end = nullptr);
 	
 	void shortestPathByEdgeCardinality(Vertex<T> *s);
+	void shortestPathFrom(Vertex<T> *s);
 	void topologicalSorting();
 	void stronglyConnectedComponents(); 
 	
@@ -74,20 +76,26 @@ void DirectedGraph<T>::inputLineHandler1(DirectedGraph<T> *g, std::string &line,
 	trim(line);
 	if (line.size() == 0) return;
 	
-	std::size_t tab_pos = line.find('\t');
+	std::size_t tab_pos_1 = line.find('\t');
+	std::size_t tab_pos_2 = line.find('\t', tab_pos_1 + 1);
 	
-	if (tab_pos != std::string::npos) { // got two vertices 
-		T vData = parser(line.substr(0, tab_pos));
-		T wData = parser(line.substr(tab_pos + 1));
+	if (tab_pos_1 != std::string::npos) { // got atleast two numbers 
+		T vData = parser(line.substr(0, tab_pos_1));
+		T wData = parser(line.substr(tab_pos_1 + 1));
+		
+		double edgeWeight = 1;
+		if (tab_pos_2 != std::string::npos) { // got three numbers // third number is weight (double)
+			edgeWeight = std::stod(line.substr(tab_pos_2 + 1));
+		}
 		
 		Vertex<T> *v = g->getOrCreateVertex(vData);
 		Vertex<T> *w = g->getOrCreateVertex(wData);
 		
-		DirectedEdge<T> *e = g->insertEdge(g->createEdge(v, w));
+		DirectedEdge<T> *e = g->insertEdge(g->createEdge(v, w, edgeWeight));
 		g->addEdgeToAdjacencyList(e, v);
 		g->addEdgeToIncomingEdgesList(e, w);
 	}
-	else {
+	else { // only one number
 		T vertexData = parser(line);
 		g->getOrCreateVertex(vertexData);
 	}
@@ -252,6 +260,36 @@ void DirectedGraph<T>::shortestPathByEdgeCardinality(Vertex<T> *s) {
 	);
 }
 
+// Dijkstra's algorithm
+template <typename T>
+void DirectedGraph<T>::shortestPathFrom(Vertex<T> *s) {
+	markAllVerticesUnexplored();
+	MinHeap<double, Vertex<T> *> *h = new MinHeap<double, Vertex<T> *>;
+	 
+	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {
+		h->insert(std::numeric_limits<double>::max(), v);
+	}
+	h->decreaseKeyIfNewKeyLess(0, s);
+	
+	while (h->size() >= 0) {
+		std::pair<double, Vertex<T> *> p = h->extractMin();
+		Vertex<T> *v = p.second;
+		double key = p.first;
+		
+		v->data->data_double_1 = key;
+		v->explored = true;
+		
+		for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext()) {
+			Vertex<T> *adjacent_vertex = edge->second;
+			if (!adjacent_vertex->explored) {
+				double possibleNewKey = v->data->data_double_1 + edge->weight;
+				h->decreaseKeyIfNewKeyLess(possibleNewKey, adjacent_vertex);
+			}
+		}
+		
+	}
+	
+}
 
 
 template <typename T>
@@ -259,14 +297,16 @@ void DirectedGraph<T>::disp() {
 	
 	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {			
 		std::cout << "V" << v->value << ", X" << v->explored << ", DI1:" << v->data->data_int_1 
-				  << ", DB1:" << v->data->data_double_1  
-				  << ", DP1:" << v->data->data_pointer_to_vertex_1->value << ", Adj:";
-				
+				  << ", DB1:" << v->data->data_double_1;
+		
+		if (v->data->data_pointer_to_vertex_1)
+			std::cout  << ", DP1:" << v->data->data_pointer_to_vertex_1->value;
+		
+		std:: cout << ", Adj:";
 		for (DirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext())
 			std::cout << edge->second->value << " ";
 		
 		std::cout << ", Inc:";
-		
 		for (DirectedEdge<T> *edge = v->incomingEdgesList->traverseInit(); edge; edge = v->incomingEdgesList->traverseNext())
 			std::cout << edge->first->value << " ";
 		

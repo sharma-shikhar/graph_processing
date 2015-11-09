@@ -198,8 +198,11 @@ void UndirectedGraph<T>::disp() {
 	for (Vertex<T> *v = vertices->traverseInit(); v; v = vertices->traverseNext()) {		
 		std::cout << "V" << v->value << ", X" << v->explored << ", DI1:" << v->data->data_int_1  
 				  << ", DB1:" << v->data->data_double_1  
-				  << ", DP1:" << v->data->data_pointer_to_vertex_1->value << ", Adj:";
 		
+		if (v->data->data_pointer_to_vertex_1)
+			std::cout  << ", DP1:" << v->data->data_pointer_to_vertex_1->value;
+		
+		std:: cout << ", Adj:";
 		for (UndirectedEdge<T> *edge = v->adjacencyList->traverseInit(); edge; edge = v->adjacencyList->traverseNext())
 			std::cout << edge->getOtherVertex(v)->value << " ";
 		
