@@ -28,6 +28,7 @@ class MinHeap {
 	std::pair<K,V> extractMin();
 	std::pair<K,V> peekMin();
 	void disp();
+	void decreaseKey(K newKey, V element);
 };
 
 template <typename K, typename V>
@@ -104,4 +105,10 @@ int MinHeap<K,V>::bubbleUp(int i) {
 		i = par(i);
 	}
 	return i;
+}
+
+
+template <typename K, typename V>
+void MinHeap<K,V>::decreaseKey(K newKey, V element) {
+	
 }

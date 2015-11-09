@@ -16,8 +16,12 @@ class DirectedGraph {
 	
 	static void inputLineHandler1(DirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
 	
-	List<Vertex<T> *> *vertices;
-	List<DirectedEdge<T> *> *edges;
+	List<Vertex<T> *> _vertices;
+	List<Vertex<T> *> *vertices = &_vertices;
+	
+	List<DirectedEdge<T> *> _edges;
+	List<DirectedEdge<T> *> *edges = &_edges;
+	
 	std::unordered_map<T, Vertex<T> *> valueToVertexMapper;
 	
 	bool vertex_exists(const T &val) {
@@ -47,10 +51,8 @@ class DirectedGraph {
 		return edges->pushBack(e);
 	}
 	Vertex<T> *getOrCreateVertex(T val);
-	DirectedGraph() {
-		vertices = new List<Vertex<T> *>();
-		edges = new List<DirectedEdge<T> *>();
-	}
+	
+	DirectedGraph() {}
 	
 	void initWithFile(const std::string filename, std::function<void(DirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> inputLineHandler = DirectedGraph<T>::inputLineHandler1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
 	

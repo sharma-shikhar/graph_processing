@@ -13,8 +13,12 @@ class UndirectedGraph {
 	
 	static void inputLineHandler1(UndirectedGraph<T> *g, std::string &line, std::function<T(const std::string &)> parser);
 		
-	List<Vertex<T> *> *vertices;
-	List<UndirectedEdge<T> *> *edges;
+	List<Vertex<T> *> _vertices;
+	List<Vertex<T> *> *vertices = &_vertices;
+	
+	List<UndirectedEdge<T> *> _edges;
+	List<UndirectedEdge<T> *> *edges = &_edges;
+	
 	std::unordered_map<T, Vertex<T> *> valueToVertexMapper;
 	
 	bool vertexExists(const T &val) {
@@ -41,10 +45,9 @@ class UndirectedGraph {
 		return edges->pushBack(e);
 	}
 	Vertex<T> *getOrCreateVertex(T val);
-	UndirectedGraph() {
-		vertices = new List<Vertex<T> *>();
-		edges = new List<UndirectedEdge<T> *>();
-	}
+	
+	UndirectedGraph() {}
+	
 	void initWithFile(const std::string filename, std::function<void(UndirectedGraph<T> *, std::string &, std::function<T(const std::string &)>)> inputLineHandler = UndirectedGraph<T>::inputLineHandler1, std::function<T(const std::string &)> parser = Vertex<T>::parser);
 	void markAllVerticesUnexplored();
 	void breadthFirstSearch(Vertex<T> *s, std::function<void(UndirectedEdge<T> *, Vertex<T> *)> handleEdgeAndVertex = nullptr);

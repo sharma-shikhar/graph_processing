@@ -1,10 +1,9 @@
 template <typename T>
 class Queue {
-	List<T> *q;
+	List<T> _q;
+	List<T> *q = &_q;
   public:
-	Queue() {
-		q = new List<T>();
-	}
+	Queue() {}
 	bool isEmpty() {return q->isEmpty();}
 	T enqueue(T data);
 	T dequeue();

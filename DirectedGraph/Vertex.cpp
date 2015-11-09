@@ -10,18 +10,21 @@ class VertexExtraData {
 template <typename T>
 class Vertex {
   public:
-  	VertexExtraData<T> *data;
-	T value;
+  	T value;
 	bool explored;
-	List<DirectedEdge<T> *> *adjacencyList;
-	List<DirectedEdge<T> *> *incomingEdgesList;
-	Vertex(T value) : value(value), explored(false) {
-		data = new VertexExtraData<T>();
-		adjacencyList = new List<DirectedEdge<T> *>;
-		incomingEdgesList = new List<DirectedEdge<T> *>;
-	}
+	  
+	VertexExtraData<T> _data;
+	VertexExtraData<T> *data = &_data;
+	
+	List<DirectedEdge<T> *> _adjacencyList;
+	List<DirectedEdge<T> *> *adjacencyList = &_adjacencyList;
+	
+	List<DirectedEdge<T> *> _incomingEdgesList;
+	List<DirectedEdge<T> *> *incomingEdgesList = &_incomingEdgesList;
+	
+	Vertex(T value) : value(value), explored(false) {}
 	static int parser(const std::string &str);
-	~Vertex() {delete adjacencyList; delete incomingEdgesList;}
+	~Vertex() {}
 };
 
 template <typename T>
