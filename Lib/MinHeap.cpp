@@ -14,6 +14,7 @@ class MinHeap {
 	int maxHeapify(int i);
 	int bubbleUp(int i);
 	
+	int getElementIndexFromMapper(V element) {return elementToIndexMapper[element];}
 	void updateElementIndexInMapper(V element, int index) {elementToIndexMapper[element] = index;}
 	void deleteElementFromMapper(V element) {elementToIndexMapper.erase(element);}
 	void insertElementInMapper(V element, int index) {elementToIndexMapper[element] = index;}
@@ -107,8 +108,15 @@ int MinHeap<K,V>::bubbleUp(int i) {
 	return i;
 }
 
-
 template <typename K, typename V>
 void MinHeap<K,V>::decreaseKey(K newKey, V element) {
+	K _key;
+	V _element;
+	int index = getElementIndexFromMapper(element);
+	
+	if (newKey < arr[index].first) {
+		arr[index].first = newKey;
+		bubbleUp(index);
+	}
 	
 }
